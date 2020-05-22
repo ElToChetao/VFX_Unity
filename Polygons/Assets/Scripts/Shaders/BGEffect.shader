@@ -53,8 +53,12 @@
                 float y = i.uv.y;
                 y = _StripeOffset + y * _Stripe;
                 y = fmod(y, 1.0);
-                if (y < 0.5)
-                    col = _StripeCol;
+
+                float isStripe = 1000 * (y - 0.5);
+                isStripe = saturate(isStripe);
+                float4 newCol = lerp(col, _StripeCol, _NonStripeAlpha);
+                col = lerp(_StripeCol, newCol, isStripe);
+
                 return col;
             }
             ENDCG

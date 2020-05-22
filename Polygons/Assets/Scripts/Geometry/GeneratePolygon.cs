@@ -33,11 +33,6 @@ public class GeneratePolygon : MonoBehaviour
         time = Random.Range(8f, 15f);
         Invoke("Destroy", 2);
     }
-    public void SetPositions(Vector3 low, Vector3 high)
-    {
-        Vector3 direction = high - low;
-
-    }
     private void Destroy()
     {
         gameObject.SetActive(false);
@@ -52,7 +47,6 @@ public class GeneratePolygon : MonoBehaviour
 
     private void UpdateFigure()
     {
-        //Test();
         GenerateRandomMesh();
     }
 
@@ -153,164 +147,6 @@ public class GeneratePolygon : MonoBehaviour
         }
 
         UpdateMesh(vertices, triangles);
-    }
-    private void Test()
-    {
-        int numVertices = Random.Range(4, 8);
-        int numMiddles = Random.Range(1, 3);
-        numMiddles = 2;
-
-        float angle = Random.Range(1, 360);
-        float r = Random.Range(0f, radius);
-        float height = Random.Range(-3f, -1f);
-
-        lastHeight = height;
-
-        Vector3 firstVert = CreateVert(angle, r, height);
-
-        Vector3[,] middleVerts = new Vector3[numMiddles, numVertices];
-
-        float maxHeight = lastHeight;
-        for (int i = 0; i < numMiddles; i++)
-        {
-            for (int j = 0; j < numVertices; j++)
-            {
-                int offset = 360 / numVertices;
-                angle = offset * i;
-                angle += Random.Range(-offset / 4, offset / 4);
-
-                float randY = lastHeight + Random.Range(1f, 3f) + 1;
-                r = Random.Range(0f, radius);
-                if (randY > maxHeight)
-                {
-                    maxHeight = randY;
-                }
-                middleVerts[i, j] = CreateVert(angle, r, randY);
-            }
-            lastHeight = maxHeight;
-        }
-
-        angle = Random.Range(1, 360);
-        r = Random.Range(0f, radius);
-        height = Random.Range(1f, 3f) + lastHeight;
-        lastHeight = height;
-
-        Vector3 lastVert = CreateVert(angle, r, height);
-
-        int vectorLenght = 2 + middleVerts.Length;
-        Vector3[] vertices = new Vector3[vectorLenght];
-
-        int index = 0;
-        vertices[index] = firstVert;
-        index++;
-        for (int i = 0; i < numMiddles; i++)
-        {
-            for (int j = 0; j < numVertices; j++)
-            {
-                vertices[index] = middleVerts[i, j];
-                index++;
-            }
-        }
-        vertices[index] = lastVert;
-
-        int[] triangles = new int[numMiddles * numVertices * 6];
-
-        int n = 1;
-        int triIndex = 0;
-        for (int i = 0; i < numVertices; i++)
-        {
-            triangles[triIndex] = 0;
-            triIndex++;
-            if (n + 1 > numVertices)
-            {
-                triangles[triIndex] = 1;
-            }
-            else
-            {
-                triangles[triIndex] = n + 1;
-            }
-            triIndex++;
-
-            triangles[triIndex] = n;
-            triIndex++;
-
-            n++;
-        }
-        int currentMin = 1;
-        int currentMax = numVertices;
-        for (int i = 0; i < (numMiddles - 1); i++)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                //first triangle
-                triangles[triIndex] = currentMin + j;
-                triIndex++;
-                if (currentMin + j + 1 > currentMax)
-                {
-                    triangles[triIndex] = currentMin;
-                }
-                else
-                {
-                    triangles[triIndex] = currentMin + j + 1;
-                }
-                triIndex++;
-                triangles[triIndex] = currentMin + j + 4;
-                triIndex++;
-
-                //second triangle
-                triangles[triIndex] = currentMin + j + 4;
-                triIndex++;
-
-                if (currentMin + j + 1 > currentMax)
-                {
-                    triangles[triIndex] = currentMin;
-                    triIndex++;
-                    triangles[triIndex] = triangles[triIndex] = currentMin + 4;
-                }
-                else
-                {
-                    triangles[triIndex] = currentMin + j + 1;
-                    triIndex++;
-                    triangles[triIndex] = triangles[triIndex] = currentMin + j + 4 + 1;
-                }
-                triIndex++;
-            }
-            currentMin += numVertices;
-            currentMax += numVertices;
-        }
-
-        for (int i = 0; i < numVertices; i++)
-        {
-            triangles[triIndex] = currentMin + i;
-            triIndex++;
-
-            if (currentMin + 1 + i > currentMax)
-            {
-                triangles[triIndex] = currentMin;
-            }
-            else
-            {
-                triangles[triIndex] = currentMin + 1 + i;
-            }
-            triIndex++;
-
-            triangles[triIndex] = vertices.Length - 1;
-            triIndex++;
-
-            n++;
-        }
-        UpdateMesh(vertices, triangles);
-    }
-    private Vector3 CreateVert(float angle, float radius, float height)
-    {
-        angle *= Mathf.Deg2Rad;
-
-        Vector3 vert;
-        vert.x = radius * Mathf.Cos(angle);
-        vert.y = height;
-        vert.z = radius * Mathf.Sin(angle);
-
-        return vert;
     }
 
     private void MiddleCover(int numVertices, Vector3[] lowVertices, Vector3[] upVertices)
